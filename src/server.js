@@ -34,6 +34,11 @@ const io = new Server(server, {
 app.use(cors(corsOptions));
 
 app.use(express.json());
+
+app.get('/',(req,res)=>{
+  res.send("Hello World");
+})
+
 app.use('/product',productRouter)
 
 io.on("connection", (socket)=>{
