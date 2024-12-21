@@ -20,6 +20,7 @@ model Product {
   startingBid        Int
   highestBid         Int?
   highestBidUserName String?
+  version            Int     @default(1)
   isActive           Boolean @default(true)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
