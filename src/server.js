@@ -43,8 +43,8 @@ app.use('/product',productRouter)
 
 io.on("connection", (socket)=>{
     const connectedUsers = io.engine.clientsCount;
-    console.log(connectedUsers);
-    console.log(`user connected to, Socket Id: ${socket.id}`)
+    // console.log(connectedUsers);
+    // console.log(`user connected to, Socket Id: ${socket.id}`)
 
     socket.on('bid',async ({productId, username, bid})=>{
       try {
@@ -61,12 +61,26 @@ io.on("connection", (socket)=>{
           const currentBid = product.highestBid || product.startingBid;
   
           if(currentBid >= bid){
-            console.log(`Rejected: ${username} | Bid: ${bid} | Timestamp: ${new Date()}`);
+            io.emit('logs',{
+              status: "Rejected",
+              username: username,
+              bid: bid,
+              currentBid: currentBid,
+              timeStamp: new Date()
+            })
+            // console.log(`Rejected: ${username} | Bid: ${bid} | Timestamp: ${new Date()}`);
             return socket.emit("bidError", "Your bid is lower than the current highest bid.");
           }
   
           if(currentBid + 5 < bid){
-            console.log(`Rejected : ${username} | Bid: ${bid} | Timestamp: ${new Date()}`);
+            io.emit('logs',{
+              status: "Rejected",
+              username: username,
+              bid: bid,
+              currentBid: currentBid,
+              timeStamp: new Date()
+            })
+            // console.log(`Rejected : ${username} | Bid: ${bid} | Timestamp: ${new Date()}`);
             return socket.emit("bidError", "Your bid cannot be more the +5 of the current price");
           }
   
@@ -83,7 +97,14 @@ io.on("connection", (socket)=>{
           });
 
           if (updatedBid.count === 0) {
-            console.log(`Rejected : ${username} | Bid: ${bid} | Timestamp: ${new Date()}`)
+            io.emit('logs',{
+              status: "Rejected",
+              username: username,
+              bid: bid,
+              currentBid: currentBid,
+              timeStamp: new Date()
+            })
+            // console.log(`Rejected : ${username} | Bid: ${bid} | Timestamp: ${new Date()}`)
             return socket.emit("bidError", "The product has already been updated. Please try again.");
           }
   
@@ -92,8 +113,15 @@ io.on("connection", (socket)=>{
             currentBid: bid,
             username: username
           })
-          console.log(`Accepted: ${username} - ${bid} | Timestamp: ${new Date()}`);
 
+          io.emit('logs',{
+            status: "Accepted",
+            username: username,
+            bid: bid,
+            currentBid: bid,
+            timeStamp: new Date()
+          })
+          console.log(`Accepted: ${username} - ${bid} | Timestamp: ${new Date()}`);
         })
       } catch (error) {
         console.error("Error processing bid:", error);
